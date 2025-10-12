@@ -1,0 +1,34 @@
+Notas: Parte 1: Infraestructura, Datos y Estadísticas
+Daniel Alejandro Arrieta Víquez
+
+Archivos:
+
+1. laberinto.h / laberinto.cpp
+   -Define la estructura de la matriz del laberinto.
+   -Inicializa las celdas con muros activos y sin visitar.
+   -Establece las posiciones de inicio, fin y jugador.
+
+2. menu.h / menu.cpp
+   -Muestra el menú principal con opciones: Jugar, Estadísticas, Salir.
+   -Permite navegar con flechas y seleccionar con ENTER.
+   -Controla el estado del programa.
+
+3. configuracion.h / configuracion.cpp
+   -Permite al usuario elegir el tamaño del laberinto (ancho y alto).
+   -Navegación con flechas y confirmación con ENTER.
+   -Se integra con la generación del laberinto.
+
+4. estadisticas.h / estadisticas.cpp
+   -Guarda los datos de cada partida en un archivo de texto.
+   -Muestra las estadísticas en pantalla.
+   -Espera una tecla para volver al menú principal.
+
+5. main.cpp
+   -Coordina todos los módulos.
+   -Inicializa Allegro y sus componentes.
+   -Controla el flujo del programa según el estado actual.
+   -Llama a los módulos de configuración, generación y juego.
+
+A través del código, y específicamente en las partes de "generador" y "juego" les intenté indicar y dejar un espacio donde van sus partes, pero siéntanse libres de modificar, agregar o eliminar lo que quieran. También comenté el código, pero cualquier duda que tengan háganmela saber y con mucho gusto
+
+Nota: Intente poner una fuente de letra que permitiera caracteres especiales, pero me dio algunos problemas, así que pensé que lo mejor era cambiarla cuando nos enfoquemos en los visuales, pero pueden cambiarla si quieren.

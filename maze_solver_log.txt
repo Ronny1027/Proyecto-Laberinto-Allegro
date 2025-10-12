@@ -1,0 +1,14 @@
+Size: 10x10, Movimientos: 42, Tiempo: 15.70s
+Size: 11x10, Movimientos: 42, Tiempo: 15.70s
+Size: 10x10, Movimientos: 50, Tiempo: 20.50s
+Size: 16x16, Movimientos: 50, Tiempo: 20.50s
+Size: 12x10, Movimientos: 50, Tiempo: 20.50s
+Size: 10x8, Movimientos: 50, Tiempo: 20.50s
+Size: 10x10, Movimientos: 50, Tiempo: 20.50s
+Size: 13x13, Movimientos: 50, Tiempo: 20.50s
+Size: 10x10, Movimientos: 50, Tiempo: 20.50s
+Size: 10x10, Movimientos: 50, Tiempo: 20.50s
+Size: 15x10, Movimientos: 50, Tiempo: 20.50s
+Size: 10x10, Movimientos: 50, Tiempo: 20.50s
+Size: 11x10, Movimientos: 50, Tiempo: 20.50s
+Size: 10x10, Movimientos: 50, Tiempo: 20.50s
