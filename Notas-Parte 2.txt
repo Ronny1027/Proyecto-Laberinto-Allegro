@@ -1,0 +1,15 @@
+Notas-Parte 2
+En este avance se modificaron dos archivos
+Generador.cpp 
+Juego.cpp
+En el generador se incluyo toda la logica que se debia desarrollar
+Casi que todas las lineas estan documentadas, explicando como funciona la logica del Recursive Backtracker
+La logica consiste en un codigo que genera caminos aleatorios a partir de ciertos modulos, de esta forma se obtiene el laberinto.
+No es una función que trae la parte grafica, eso es lo correspondiente a la parte 3 con el renderizado, aún así se incluyo una función extra en el 
+Juego.cpp que sirvio para probar la veracidad de la logica creada y ademas generar una pantalla de salida.
+¿Qué falta?
+Generar las paredes y el suelo a partir de la estructuras/Renderizado: Esto se puede lograr cambiando la parte de los colores usados por las imagenes que se van a usar. Deberia de ser una modificación muy simple, esta modificación se puede ver apoyada por el uso de una IA.
+Opciones de juego: Las funciones para jugar, aqui se incluye la parte del personaje, los movimientos entre paredes y la pantalla de victoria. Deberia funcionar solo con la implementación del codigo de Allegro
+
+
+El código generado deberia funcionar con elementos graficos, en caso de algun problema se puede indicar con confianza y si se necesita modificar algún codigo tampoco hay problema. Falta poco, sigamos con fuerza :)
