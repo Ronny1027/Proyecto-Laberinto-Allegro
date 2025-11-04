@@ -33,6 +33,7 @@ int main() {
     al_init_font_addon();        //Para usar fuentes
     al_init_ttf_addon();         //Para fuentes TTF
     al_init_primitives_addon();  //Para dibujar líneas y formas
+    al_init_image_addon();       // Para cargar el ícono
 
     //3. Crear ventana, cola de eventos y fuente
     ALLEGRO_DISPLAY* display = al_create_display(800, 600); // Tamaño ventana
@@ -41,8 +42,30 @@ int main() {
         return -1;
     }
 
+    ALLEGRO_BITMAP* icono = al_load_bitmap("iconos/icon.ico");
+    if (!icono) {
+        icono = al_load_bitmap("iconos/icon.png");
+    }
+    if (icono) {
+        al_set_display_icon(display, icono);
+        printf("Ícono cargado correctamente\n");
+    }
+    else {
+        printf("No se pudo cargar el ícono\n");
+    }
+
+    // 4. Configurar título de la ventana
+    al_set_window_title(display, "Laberinto Allegro");
+
     ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
+    if (!queue) {
+        fprintf(stderr, "Error al crear la cola de eventos.\n");
+        al_destroy_display(display);
+        return -1;
+    }
+
     al_register_event_source(queue, al_get_keyboard_event_source());
+    al_register_event_source(queue, al_get_display_event_source(display));
 
     //Fuente integrada (Se usa temporalmente una por dedecto, sin tildes ni caracteres especiales)
     ALLEGRO_FONT* fuente = al_create_builtin_font();
@@ -52,6 +75,7 @@ int main() {
 
     //5. Mostrar el menú al iniciar
     mostrarMenu(fuente);
+    al_flip_display();
 
     //6. Bucle principal del programa
     while (estado != SALIR) {
@@ -64,6 +88,7 @@ int main() {
             estado = manejarMenu(evento); //Cambia estado según tecla
             if (estado == MENU_PRINCIPAL) {
                 mostrarMenu(fuente); //Redibuja si se sigue en el menú
+                al_flip_display(); // Icono del programa
             }
             break;
 
@@ -72,6 +97,7 @@ int main() {
             int ancho = 10;
             int alto = 10;
             mostrarConfiguracion(fuente, ancho, alto);
+            al_flip_display();
 
             bool confirmado = false;
             while (!confirmado) {
@@ -81,6 +107,7 @@ int main() {
 
                 confirmado = manejarConfiguracion(eventoConfig, ancho, alto);
                 mostrarConfiguracion(fuente, ancho, alto);
+                al_flip_display();
             }
             
             //Inicializa la matriz del laberinto con celdas vacías
@@ -95,14 +122,16 @@ int main() {
 
         case ESTADISTICAS:
             mostrarEstadisticasEnPantalla(fuente); //Se muestran las estadísticas
+            al_flip_display();
             estado = MENU_PRINCIPAL;
             break;
 
         case JUEGO:
             //Llama al módulo de juego (Persona 3/Cristhofer))
-            ejecutarJuego(fuente);
+            ejecutarJuego(fuente, display);
 
             estado = MENU_PRINCIPAL;
+            al_flip_display();
             break;
     
 
@@ -112,6 +141,7 @@ int main() {
     }
 
     //7. Liberar recursos
+    if (icono) al_destroy_bitmap(icono);
     al_destroy_display(display);
     al_destroy_event_queue(queue);
     al_destroy_font(fuente);
