@@ -25,3 +25,9 @@ Size: 10x10, Movimientos: 300, Tiempo: 23.24s
 Size: 20x20, Movimientos: 893, Tiempo: 63.77s
 Size: 5x5, Movimientos: 55, Tiempo: 5.49s
 Size: 10x10, Movimientos: 55, Tiempo: 8.93s
+Size: 10x10, Movimientos: 250, Tiempo: 42.57s
+Size: 10x10, Movimientos: 210, Tiempo: 35.14s
+Size: 10x10, Movimientos: 145, Tiempo: 24.88s
+Size: 10x10, Movimientos: 92, Tiempo: 16.38s
+Size: 16x12, Movimientos: 278, Tiempo: 42.37s
+Size: 10x10, Movimientos: 152, Tiempo: 29.36s

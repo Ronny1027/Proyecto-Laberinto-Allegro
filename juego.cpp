@@ -40,7 +40,7 @@ DatosPartida ejecutarJuego(ALLEGRO_FONT* fuente, ALLEGRO_DISPLAY* displayPrincip
 
     // Tamaño del jugador y meta escalados
     float radioJugador = tamCelda / 6.0f;
-    float velocidad = 5.0f;
+    float velocidad = tamCelda / 6.0f;
 
     // Posición de la meta (centro de la última celda)
     int metaX = anchoLaberinto - 1;
@@ -56,6 +56,7 @@ DatosPartida ejecutarJuego(ALLEGRO_FONT* fuente, ALLEGRO_DISPLAY* displayPrincip
 
     //Contadores para obtener estadisticas
     int movimientos = 0;
+    int movimientosframe = 0;
     double tiempoInicio = al_get_time();
     double tiempoSegundos = 0.0;
 
@@ -118,9 +119,14 @@ DatosPartida ejecutarJuego(ALLEGRO_FONT* fuente, ALLEGRO_DISPLAY* displayPrincip
             if (teclas[ALLEGRO_KEY_DOWN]) { intentoY += velocidad; seMovio = true; }
 
             if (seMovio) {
+                movimientosframe++; //Esta variable suma 2 por movimiento
+
+
+            }
+
+            if (movimientosframe ==2) { //Cuando esa varibale llega a 2, se suma 1 al número de movimientos
                 movimientos++;
-
-
+                movimientosframe = 0; //Se regresa a 0 para continuar evaluando
             }
 
             // Función auxiliar para verificar colisión en ambos ejes

@@ -18,7 +18,7 @@ void mostrarMenu(ALLEGRO_FONT* fuente) {
     // Lista de opciones del menú
     const char* opciones[] = {
         "1. Generar laberinto y jugar",
-        "2. Estadisticas Globales", //Lo escribí sin tilde, ya que la fuente actual no la soporta
+        "2. Estadisticas globales", //Lo escribí sin tilde, ya que la fuente actual no la soporta
         "3. Ver resumen global",
         "4. Salir"
     };
