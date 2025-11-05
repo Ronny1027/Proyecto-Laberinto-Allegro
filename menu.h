@@ -9,6 +9,7 @@ enum EstadoPrograma {
     CONFIGURACION_LABERINTO, //Pantalla para elegir ancho y alto del laberinto
     JUEGO, //Estado donde se ejecuta el juego visual
     ESTADISTICAS, //Pantalla que muestra estadísticas guardadas
+    VICTORIA, //Pantalla de victoria tras finalizar un laberinto
     SALIR // Finaliza el programa
 };
 

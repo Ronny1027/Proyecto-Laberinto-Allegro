@@ -20,9 +20,11 @@
 #include "estadisticas.h" //Pantalla de estadísticas
 #include "generador.h" //Vincular con función que reciba la matriz laberinto (Persona 2/Ronny)
 #include "juego.h" //Vincular con juego (Persona 3/Cristopher)
+#include "victoria.h" //Obtiene la pantalla de victoria
 
 
 int main() {
+    static DatosPartida datosVictoria; //Variable global temporal para guardar los datos de partida
     //2. Inicialización de Allegro y sus componentes
     if (!al_init()) {
         fprintf(stderr, "Error al inicializar Allegro.\n"); //En caso de que de error
@@ -83,7 +85,7 @@ int main() {
         al_wait_for_event(queue, &evento); //Espera una tecla
 
         switch (estado) {
-        case MENU_PRINCIPAL:
+        case MENU_PRINCIPAL: {
             //Muestra el menú principal con las opciones disponibles
             estado = manejarMenu(evento); //Cambia estado según tecla
             if (estado == MENU_PRINCIPAL) {
@@ -91,6 +93,7 @@ int main() {
                 al_flip_display(); // Icono del programa
             }
             break;
+        }
 
         case CONFIGURACION_LABERINTO: {
             //Pantalla interactiva para elegir tamaño del laberinto
@@ -120,20 +123,53 @@ int main() {
             break;
         }
 
-        case ESTADISTICAS:
+        case ESTADISTICAS: {
             mostrarEstadisticasEnPantalla(fuente); //Se muestran las estadísticas
             al_flip_display();
             estado = MENU_PRINCIPAL;
             break;
+        }
 
-        case JUEGO:
-            //Llama al módulo de juego (Persona 3/Cristhofer))
-            ejecutarJuego(fuente, display);
-
-            estado = MENU_PRINCIPAL;
+        case VICTORIA: {
+            mostrarPantallaVictoria(fuente, datosVictoria);
             al_flip_display();
+
+            bool decisionTomada = false;
+
+            while (!decisionTomada) {
+                ALLEGRO_EVENT eventoVictoria;
+                al_wait_for_event(queue, &eventoVictoria);
+
+                int opcion = manejarVictoria(eventoVictoria);
+                if (opcion == 1) {
+                    estado = CONFIGURACION_LABERINTO;
+                    decisionTomada = true;
+                }
+                else if (opcion == 2) {
+                    estado = MENU_PRINCIPAL;
+                    decisionTomada = true;
+                }
+                else if (opcion == 3) {
+                    estado = SALIR;
+                    decisionTomada = true;
+                }
+
+                //Redibujar
+                if (!decisionTomada) {
+                    mostrarPantallaVictoria(fuente, datosVictoria);
+                    al_flip_display();
+                }
+            }
             break;
-    
+        }
+
+        case JUEGO: {
+            //Llama al módulo de juego (Persona 3/Cristhofer))
+            DatosPartida datos = ejecutarJuego(fuente, display);
+            datosVictoria = datos;
+            estado = VICTORIA;
+            break;
+        }
 
         default:
             break;

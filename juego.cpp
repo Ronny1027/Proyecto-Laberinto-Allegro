@@ -13,7 +13,7 @@
 /* El renderizado es solo modificar un poco lo que ya se tiene en la funcion ejecutarJuego.
 Y agregar aspectos simples de formato.*/
 //En este momento, puse temporalmente que simule una partida para probar el sistema de estadisticas
-void ejecutarJuego(ALLEGRO_FONT* fuente, ALLEGRO_DISPLAY* displayPrincipal) {
+DatosPartida ejecutarJuego(ALLEGRO_FONT* fuente, ALLEGRO_DISPLAY* displayPrincipal) {
     std::cout << "Juego iniciado con laberinto de " << anchoLaberinto << "x" << altoLaberinto << "\n";
 
     std::vector<std::vector<Celda>> laberinto(altoLaberinto, std::vector<Celda>(anchoLaberinto));
@@ -76,6 +76,8 @@ void ejecutarJuego(ALLEGRO_FONT* fuente, ALLEGRO_DISPLAY* displayPrincipal) {
    
 	// Bucle principal del juego
     bool redibujar = true;
+    bool salirPorVictoria = false;
+
     ALLEGRO_EVENT_QUEUE* colaEventos = al_create_event_queue();
     al_register_event_source(colaEventos, al_get_display_event_source(display));
     al_register_event_source(colaEventos, al_get_keyboard_event_source()); // ← AGREGAR ESTA
@@ -200,12 +202,18 @@ void ejecutarJuego(ALLEGRO_FONT* fuente, ALLEGRO_DISPLAY* displayPrincipal) {
             if (enMetaX && enMetaY) {
                 juegoGanado = true;
                 tiempoSegundos = al_get_time() - tiempoInicio;
+                salirPorVictoria = true; // Cambia la variable a verdadero
 
-                // Reproducir sonido de victoria si está disponible
+                // Reproducir sonido de victoria
                 if (sonidoVictoria && !sonidoReproducido) {
                     al_play_sample(sonidoVictoria, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
                     sonidoReproducido = true;
+                    al_rest(0.3); //Pausa para que el sonido se reproduzca
                 }
+
+                //Salir inmediatamente al ganar
+                redibujar = false;
+                break; // Salir del bucle del juego inmediatamente
             }
         }
 
@@ -269,6 +277,7 @@ void ejecutarJuego(ALLEGRO_FONT* fuente, ALLEGRO_DISPLAY* displayPrincipal) {
 
         al_flip_display();
 
+
         if (evento.type == ALLEGRO_EVENT_KEY_DOWN) {
             if (evento.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
                 redibujar = false;
@@ -278,8 +287,8 @@ void ejecutarJuego(ALLEGRO_FONT* fuente, ALLEGRO_DISPLAY* displayPrincipal) {
 
     al_destroy_event_queue(colaEventos);
     
-    if (sonidoVictoria) al_destroy_sample(sonidoVictoria);
-    al_uninstall_audio();
+    //if (sonidoVictoria) al_destroy_sample(sonidoVictoria);
+    //al_uninstall_audio();
 
     // Guardar estadísticas reales
     if (juegoGanado) {
@@ -291,4 +300,12 @@ void ejecutarJuego(ALLEGRO_FONT* fuente, ALLEGRO_DISPLAY* displayPrincipal) {
         std::cout << "Juego abandonado. Movimientos: " << movimientos << ", Tiempo: " << tiempoSegundos << " segundos\n";
     }
 
+    //Guardar datos de partida
+    DatosPartida datos;
+    datos.movimientos = movimientos;
+    datos.tiempo = tiempoSegundos;
+    datos.anchoLaberinto = anchoLaberinto;
+    datos.altoLaberinto = altoLaberinto;
+
+    return datos; //Retorno de datos
 }
