@@ -18,15 +18,16 @@ void mostrarMenu(ALLEGRO_FONT* fuente) {
     // Lista de opciones del menú
     const char* opciones[] = {
         "1. Generar laberinto y jugar",
-        "2. Estadisticas", //Lo escribí sin tilde, ya que la fuente actual no la soporta
-        "3. Salir"
+        "2. Estadisticas Globales", //Lo escribí sin tilde, ya que la fuente actual no la soporta
+        "3. Ver resumen global",
+        "4. Salir"
     };
 
     //Dibuja el título del menú en verde
     al_draw_text(fuente, al_map_rgb(0, 255, 0), 100, 40, 0, "Menu Principal");
 
     //Recorre las opciones y las dibuja en pantalla
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 4; i++) {
         //Si la opción está seleccionada, se dibuja en amarillo. Si no, la dibuja en blanco
         ALLEGRO_COLOR color = (i == opcionSeleccionada) ? al_map_rgb(255, 255, 0) : al_map_rgb(255, 255, 255);
         //Dibuja la opción en la posición correspondiente
@@ -44,16 +45,17 @@ EstadoPrograma manejarMenu(ALLEGRO_EVENT& evento) {
     if (evento.type == ALLEGRO_EVENT_KEY_DOWN) {
         switch (evento.keyboard.keycode) {
         case ALLEGRO_KEY_UP:
-            opcionSeleccionada = (opcionSeleccionada + 2) % 3; //Subir opción
+            opcionSeleccionada = (opcionSeleccionada - 1 + 4) % 4; // Subir opción correctamente
             break;
         case ALLEGRO_KEY_DOWN:
-            opcionSeleccionada = (opcionSeleccionada + 1) % 3; //Bajar opción
+            opcionSeleccionada = (opcionSeleccionada + 1) % 4; // Bajar opción
             break;
         case ALLEGRO_KEY_ENTER:
             switch (opcionSeleccionada) {
             case 0: return CONFIGURACION_LABERINTO;
             case 1: return ESTADISTICAS;
-            case 2: return SALIR;
+            case 2: return RESUMEN_GLOBAL;
+            case 3: return SALIR;
             }
         }
     }

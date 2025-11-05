@@ -12,3 +12,5 @@ void mostrarEstadisticasGlobales();
 
 //Muestra las estadísticas en pantalla usando Allegro
 void mostrarEstadisticasEnPantalla(ALLEGRO_FONT* fuente);
+
+void mostrarResumenEstadisticasGlobales(ALLEGRO_FONT* fuente);

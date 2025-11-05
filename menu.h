@@ -10,6 +10,7 @@ enum EstadoPrograma {
     JUEGO, //Estado donde se ejecuta el juego visual
     ESTADISTICAS, //Pantalla que muestra estadísticas guardadas
     VICTORIA, //Pantalla de victoria tras finalizar un laberinto
+    RESUMEN_GLOBAL,
     SALIR // Finaliza el programa
 };
 

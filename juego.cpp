@@ -19,27 +19,35 @@ DatosPartida ejecutarJuego(ALLEGRO_FONT* fuente, ALLEGRO_DISPLAY* displayPrincip
     std::vector<std::vector<Celda>> laberinto(altoLaberinto, std::vector<Celda>(anchoLaberinto));
     generarLaberinto(laberinto);
     
-    //Se configura las celdas
-	int tamCelda = 32; // Se define un tamaño fijo para cada celda de 32x32 pixeles.
-	int ventanaAncho = anchoLaberinto * tamCelda;// Ancho total de la ventana segun el tamaño del laberinto
-	int ventanaAlto = altoLaberinto * tamCelda;// Alto total de la ventana segun el tamaño del laberinto
-
-    // Margenes
-    int margenX = 100;
+    // Márgenes visuales
+    int margenX = 150;
     int margenY = 50;
 
-    //Se representa el jugador como un punto y la posicion inicial en el centro de la primera celda
-    float jugadorX = 100 + tamCelda / 2.0f;  // centro de la primera celda + margen
-    float jugadorY = 50 + tamCelda / 2.0f;
-    float radioJugador = 5.0f;
-    float velocidad = 6.0f;
+    // Tamaño fijo de ventana
+    const int ventanaAncho = 800;
+    const int ventanaAlto = 600;
 
-    //Se define la posicion de la meta en la ultima celda
+    // Calcular tamaño de celda para que el laberinto quepa en la ventana
+    int tamCelda = std::min(
+        (ventanaAncho - margenX * 2) / anchoLaberinto,
+        (ventanaAlto - margenY * 2) / altoLaberinto
+    );
+
+    
+    // Posición inicial del jugador (centro de la primera celda)
+    float jugadorX = margenX + tamCelda / 2.0f;
+    float jugadorY = margenY + tamCelda / 2.0f;
+
+    // Tamaño del jugador y meta escalados
+    float radioJugador = tamCelda / 6.0f;
+    float velocidad = 5.0f;
+
+    // Posición de la meta (centro de la última celda)
     int metaX = anchoLaberinto - 1;
     int metaY = altoLaberinto - 1;
     float metaPosX = margenX + metaX * tamCelda + tamCelda / 2.0f;
     float metaPosY = margenY + metaY * tamCelda + tamCelda / 2.0f;
-    float tamMeta = tamCelda / 2.0f;  // Tamaño del cuadrado de meta
+    float tamMeta = tamCelda / 2.0f;
 
     bool juegoGanado = false;
     bool teclas[ALLEGRO_KEY_MAX] = { false };
@@ -99,97 +107,70 @@ DatosPartida ejecutarJuego(ALLEGRO_FONT* fuente, ALLEGRO_DISPLAY* displayPrincip
 
         if (!juegoGanado) {
             // Calcular posición futura del jugador
-            float nuevaX = jugadorX;
-            float nuevaY = jugadorY;
-
+            
+            float intentoX = jugadorX;
+            float intentoY = jugadorY;
             bool seMovio = false;
 
-            if (teclas[ALLEGRO_KEY_UP]) {
-                nuevaY -= velocidad;
-                seMovio = true;
-            }
-            if (teclas[ALLEGRO_KEY_DOWN]) {
-                nuevaY += velocidad;
-                seMovio = true;
-            }
-            if (teclas[ALLEGRO_KEY_LEFT]) {
-                nuevaX -= velocidad;
-                seMovio = true;
-            }
-            if (teclas[ALLEGRO_KEY_RIGHT]) {
-                nuevaX += velocidad;
-                seMovio = true;
-            }
+            if (teclas[ALLEGRO_KEY_LEFT]) { intentoX -= velocidad; seMovio = true; }
+            if (teclas[ALLEGRO_KEY_RIGHT]) { intentoX += velocidad; seMovio = true; }
+            if (teclas[ALLEGRO_KEY_UP]) { intentoY -= velocidad; seMovio = true; }
+            if (teclas[ALLEGRO_KEY_DOWN]) { intentoY += velocidad; seMovio = true; }
 
-            // Contar movimientos solo si realmente se movió
             if (seMovio) {
                 movimientos++;
+
+
             }
 
-            // Detección de colisiones más precisa
-            bool colision = false;
+            // Función auxiliar para verificar colisión en ambos ejes
+            auto hayColision = [&](float x, float y) -> bool {
+                int cx = (x - margenX) / tamCelda;
+                int cy = (y - margenY) / tamCelda;
 
-            // Convertir coordenadas a celdas
-            int celdaCentroX = (nuevaX - margenX) / tamCelda;
-            int celdaCentroY = (nuevaY - margenY) / tamCelda;
+                if (cx < 0 || cx >= anchoLaberinto || cy < 0 || cy >= altoLaberinto)
+                    return true;
 
-            // Verificar que las celdas estén dentro del laberinto
-            if (celdaCentroX >= 0 && celdaCentroX < anchoLaberinto &&
-                celdaCentroY >= 0 && celdaCentroY < altoLaberinto) {
+                const Celda& celda = laberinto[cy][cx];
+                float localX = x - (margenX + cx * tamCelda);
+                float localY = y - (margenY + cy * tamCelda);
+                float margen = 2.0f;
 
-                Celda& celdaActual = laberinto[celdaCentroY][celdaCentroX];
+                // Colisión con muros de la celda actual
+                if (localY - radioJugador < margen && celda.muroNorte) return true;
+                if (localY + radioJugador > tamCelda - margen && celda.muroSur) return true;
+                if (localX - radioJugador < margen && celda.muroOeste) return true;
+                if (localX + radioJugador > tamCelda - margen && celda.muroEste) return true;
 
-                // Verificar colisiones con los muros considerando el radio del jugador
-                float offset = radioJugador + 2.0f;
-
-                // Norte
-                if (nuevaY - radioJugador < margenY + celdaCentroY * tamCelda + 4 && celdaActual.muroNorte) {
-                    if (teclas[ALLEGRO_KEY_UP]) colision = true;
+                // Colisión con muros de celdas adyacentes
+                if (cx > 0) {
+                    const Celda& izquierda = laberinto[cy][cx - 1];
+                    if (localX - radioJugador < 0 && izquierda.muroEste) return true;
+                }
+                if (cx < anchoLaberinto - 1) {
+                    const Celda& derecha = laberinto[cy][cx + 1];
+                    if (localX + radioJugador > tamCelda && derecha.muroOeste) return true;
+                }
+                if (cy > 0) {
+                    const Celda& arriba = laberinto[cy - 1][cx];
+                    if (localY - radioJugador < 0 && arriba.muroSur) return true;
+                }
+                if (cy < altoLaberinto - 1) {
+                    const Celda& abajo = laberinto[cy + 1][cx];
+                    if (localY + radioJugador > tamCelda && abajo.muroNorte) return true;
                 }
 
-                // Sur
-                if (nuevaY + radioJugador > margenY + (celdaCentroY + 1) * tamCelda - 4 && celdaActual.muroSur) {
-                    if (teclas[ALLEGRO_KEY_DOWN]) colision = true;
-                }
+                return false;
+                };
 
-                // Oeste
-                if (nuevaX - radioJugador < margenX + celdaCentroX * tamCelda + 4 && celdaActual.muroOeste) {
-                    if (teclas[ALLEGRO_KEY_LEFT]) colision = true;
-                }
+            // Verificar colisión por eje
+            bool colisionX = hayColision(intentoX, jugadorY);
+            bool colisionY = hayColision(jugadorX, intentoY);
 
-                // Este
-                if (nuevaX + radioJugador > margenX + (celdaCentroX + 1) * tamCelda - 4 && celdaActual.muroEste) {
-                    if (teclas[ALLEGRO_KEY_RIGHT]) colision = true;
-                }
+            if (!colisionX) jugadorX = intentoX;
+            if (!colisionY) jugadorY = intentoY;
 
-                // Verificar celdas adyacentes para casos en el borde entre celdas
-                if (nuevaX - radioJugador < margenX + celdaCentroX * tamCelda && celdaCentroX > 0) {
-                    Celda& celdaOeste = laberinto[celdaCentroY][celdaCentroX - 1];
-                    if (celdaOeste.muroEste && teclas[ALLEGRO_KEY_LEFT]) colision = true;
-                }
-
-                if (nuevaX + radioJugador > margenX + (celdaCentroX + 1) * tamCelda && celdaCentroX < anchoLaberinto - 1) {
-                    Celda& celdaEste = laberinto[celdaCentroY][celdaCentroX + 1];
-                    if (celdaEste.muroOeste && teclas[ALLEGRO_KEY_RIGHT]) colision = true;
-                }
-
-                if (nuevaY - radioJugador < margenY + celdaCentroY * tamCelda && celdaCentroY > 0) {
-                    Celda& celdaNorte = laberinto[celdaCentroY - 1][celdaCentroX];
-                    if (celdaNorte.muroSur && teclas[ALLEGRO_KEY_UP]) colision = true;
-                }
-
-                if (nuevaY + radioJugador > margenY + (celdaCentroY + 1) * tamCelda && celdaCentroY < altoLaberinto - 1) {
-                    Celda& celdaSur = laberinto[celdaCentroY + 1][celdaCentroX];
-                    if (celdaSur.muroNorte && teclas[ALLEGRO_KEY_DOWN]) colision = true;
-                }
-            }
-
-            // Actualizar posición solo si no hay colisión
-            if (!colision) {
-                jugadorX = nuevaX;
-                jugadorY = nuevaY;
-            }
-
+    
             // Mantener al jugador dentro de los límites del laberinto
             if (jugadorX - radioJugador < margenX) jugadorX = margenX + radioJugador;
             if (jugadorX + radioJugador > margenX + anchoLaberinto * tamCelda) jugadorX = margenX + anchoLaberinto * tamCelda - radioJugador;
@@ -230,21 +211,36 @@ DatosPartida ejecutarJuego(ALLEGRO_FONT* fuente, ALLEGRO_DISPLAY* displayPrincip
 
                 // Fondo de la celda
                 al_draw_filled_rectangle(posX, posY, posX + tamCelda, posY + tamCelda, al_map_rgb(210, 180, 140));
+                
+                float grosor = 2.0f;
+                ALLEGRO_COLOR colorMuro = al_map_rgb(139, 69, 19); // Marrón
 
                 // Dibujar muros
                 if (celda.muroNorte)
-                    al_draw_filled_rectangle(posX, posY, posX + tamCelda, posY + 4, al_map_rgb(139, 69, 19));
+                    al_draw_line(posX, posY, posX + tamCelda, posY, colorMuro, grosor);
 
                 if (celda.muroSur)
-                    al_draw_filled_rectangle(posX, posY + tamCelda - 4, posX + tamCelda, posY + tamCelda, al_map_rgb(139, 69, 19));
+                    al_draw_line(posX, posY + tamCelda, posX + tamCelda, posY + tamCelda, colorMuro, grosor);
 
                 if (celda.muroEste)
-                    al_draw_filled_rectangle(posX + tamCelda - 4, posY, posX + tamCelda, posY + tamCelda, al_map_rgb(139, 69, 19));
+                    al_draw_line(posX + tamCelda, posY, posX + tamCelda, posY + tamCelda, colorMuro, grosor);
 
                 if (celda.muroOeste)
-                    al_draw_filled_rectangle(posX, posY, posX + 4, posY + tamCelda, al_map_rgb(139, 69, 19));
+                    al_draw_line(posX, posY, posX, posY + tamCelda, colorMuro, grosor);
             }
         }
+
+        // Dibujar celda de inicio (cuadrado verde claro en la primera celda)
+        float inicioX = margenX + tamCelda / 2.0f;
+        float inicioY = margenY + tamCelda / 2.0f;
+        float tamInicio = tamCelda / 2.0f;
+
+        al_draw_filled_rectangle(inicioX - tamInicio / 2, inicioY - tamInicio / 2,
+            inicioX + tamInicio / 2, inicioY + tamInicio / 2,
+            al_map_rgb(0, 255, 0)); // Verde claro
+        al_draw_rectangle(inicioX - tamInicio / 2, inicioY - tamInicio / 2,
+            inicioX + tamInicio / 2, inicioY + tamInicio / 2,
+            al_map_rgb(0, 200, 0), 2); // Borde verde oscuro
 
         // Dibujar meta (cuadrado rojo en la celda final)
         al_draw_filled_rectangle(metaPosX - tamMeta / 2, metaPosY - tamMeta / 2,
@@ -267,12 +263,26 @@ DatosPartida ejecutarJuego(ALLEGRO_FONT* fuente, ALLEGRO_DISPLAY* displayPrincip
                 "Presiona ESC para salir");
         }
         else {
+            /*
             al_draw_text(fuente, al_map_rgb(255, 255, 255), 10, 10, 0,
                 "Laberinto Generado - Llega al cuadrado rojo - Presiona ESC para salir");
             al_draw_textf(fuente, al_map_rgb(255, 255, 255), 10, 30, 0,
                 "Movimientos: %d", movimientos);
             al_draw_textf(fuente, al_map_rgb(255, 255, 255), 10, 50, 0,
                 "Tiempo: %.1f segundos", al_get_time() - tiempoInicio);
+            */
+            int panelX = 20;
+            int panelY = 20;
+            int salto = 20;
+
+            al_draw_text(fuente, al_map_rgb(255, 255, 255), panelX, panelY, 0,
+                "Laberinto Generado");
+            al_draw_text(fuente, al_map_rgb(255, 255, 255), panelX, panelY + salto, 0,
+                "Objetivo: llegar al cuadrado rojo");
+            al_draw_textf(fuente, al_map_rgb(255, 255, 255), panelX, panelY + salto * 2, 0,
+                "Movimientos: %d", movimientos);
+            al_draw_textf(fuente, al_map_rgb(255, 255, 255), panelX, panelY + salto * 3, 0,
+                "Tiempo: %.1f s", al_get_time() - tiempoInicio);
         }
 
         al_flip_display();
@@ -282,8 +292,12 @@ DatosPartida ejecutarJuego(ALLEGRO_FONT* fuente, ALLEGRO_DISPLAY* displayPrincip
             if (evento.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
                 redibujar = false;
             }
+
         }
+
+       
     }
+    
 
     al_destroy_event_queue(colaEventos);
     
@@ -308,4 +322,6 @@ DatosPartida ejecutarJuego(ALLEGRO_FONT* fuente, ALLEGRO_DISPLAY* displayPrincip
     datos.altoLaberinto = altoLaberinto;
 
     return datos; //Retorno de datos
+
+    
 }

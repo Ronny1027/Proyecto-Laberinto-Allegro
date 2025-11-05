@@ -129,6 +129,12 @@ int main() {
             estado = MENU_PRINCIPAL;
             break;
         }
+    
+        case RESUMEN_GLOBAL: {
+            mostrarResumenEstadisticasGlobales(fuente);
+            estado = MENU_PRINCIPAL;
+            break;
+        }
 
         case VICTORIA: {
             mostrarPantallaVictoria(fuente, datosVictoria);
